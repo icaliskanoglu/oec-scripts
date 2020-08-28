@@ -56,6 +56,7 @@ jobs:
       working-directory: .release
       run: |
         ls -al
+        ls -al oec-linux/
         INTEGRATION_PATH=oec-linux/opsgenie-${INTEGRATION_NAME}
         echo ${INTEGRATION_PATH}
         if [ -d "$INTEGRATION_PATH" ]; then
