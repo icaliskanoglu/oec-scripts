@@ -41,6 +41,8 @@ jobs:
     
     - name: Copy Integration Files
       run: cp -R ${{ github.event.inputs.integration }}/. .release/oec-linux
+    - name: LS Files
+      run: ls -al .release/oec-linux/
 
     - name: Retrieve Integration Version
       run: |
