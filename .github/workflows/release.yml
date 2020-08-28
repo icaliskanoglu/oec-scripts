@@ -59,7 +59,7 @@ jobs:
         ls -al oec-linux/
         INTEGRATION_PATH=oec-linux/opsgenie-${INTEGRATION_NAME}
         echo ${INTEGRATION_PATH}
-        if [ -d "$INTEGRATION_PATH" ]; then
+        if [ -d "${INTEGRATION_PATH}" ]; then
           go get -u github.com/alexcesaro/log && \
           cd ${INTEGRATION_PATH} && \
           GOOS=linux GOARCH=amd64 go build -o send2opsgenie send2opsgenie.go
