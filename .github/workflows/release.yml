@@ -55,7 +55,7 @@ jobs:
     - name: "Release Incomming Part"
       working-directory: .release
       run: |
-        INTEGRATION_PATH=opsgenie-${INTEGRATION_NAME}
+        INTEGRATION_PATH=oec-linux/opsgenie-${INTEGRATION_NAME}
         echo ${INTEGRATION_PATH}
         if [ -d "$INCOMING_PATH" ]; then
           go get -u github.com/alexcesaro/log && \
