@@ -36,8 +36,7 @@ jobs:
         tag: ${{ github.event.inputs.oec-version }}
         file: oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip
     
-    - uses: montudor/action-zip@v0.1.0
-      name: Extracting Linux Package
+    - name: Extracting Linux Package
       with:
         args: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d .release/oec-linux
     
@@ -63,10 +62,10 @@ jobs:
           GOOS=linux GOARCH=amd64 go build -o send2opsgenie send2opsgenie.go
         fi
 
-    - uses: montudor/action-zip@v0.1.0
-      name: Compressing Linux Package
+    - name: Compressing Linux Package
       with:
         args: zip -qq -j -r .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip .release/oec-linux/
+    
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
