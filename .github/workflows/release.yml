@@ -8,7 +8,6 @@ on:
       oec-version:
         description: 'Version of OEC'
         required: true
-
 jobs:
   build:
     name: Release for Linux
@@ -31,7 +30,6 @@ jobs:
     
     - name: Download Asset
       uses: i3h/download-release-asset@v1.2.0
-      working-directory: .release/
       with:
         owner: ahmetrehaseker
         repo: oec
@@ -40,9 +38,8 @@ jobs:
     
     - uses: montudor/action-zip@v0.1.0
       name: Extracting Linux Package
-      working-directory: .release
       with:
-        args: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d oec-linux
+        args: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d .release/oec-linux
     
     - name: Copy Integration Files
       run: cp -R ${{ github.event.inputs.integration }}/. .release/oec-linux
@@ -69,7 +66,6 @@ jobs:
     - uses: montudor/action-zip@v0.1.0
       name: Compressing Linux Package
       with:
-        zip -r opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip /${INTEGRATION_PATH} 
         args: zip -qq -j -r .release/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip .release/oec-linux/
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
