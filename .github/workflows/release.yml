@@ -1,0 +1,78 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      integration:
+        description: 'Integration'     
+        required: true
+      oec-version:
+        description: 'Version of OEC'
+        required: true
+
+jobs:
+  build:
+    name: Release for Linux
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13
+      id: go
+
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Create Output Directory
+      run: mkdir -p .release
+    
+    - name: Download Asset
+      uses: i3h/download-release-asset@v1.2.0
+      working-directory: .release/
+      with:
+        owner: ahmetrehaseker
+        repo: oec
+        tag: ${{ github.event.inputs.oec-version }}
+        file: oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip
+    
+    - uses: montudor/action-zip@v0.1.0
+      name: Extracting Linux Package
+      working-directory: .release
+      with:
+        args: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d oec-linux
+    
+    - name: Copy Integration Files
+      run: cp -R ${{ github.event.inputs.integration }}/. .release/oec-linux
+
+    - name: Retrieve Integration Version
+      run: |
+        echo ::set-env name=INTEGRATION_VERSION::$(jq -r --arg v "$INTEGRATION" '.[$v]' release/oec-builder/oecScriptsVersion.json)
+
+    - name: Retrieve Integration Name
+      run: |
+        echo ::set-env name=INTEGRATION_NAME::$(echo "$INTEGRATION" | awk '{print tolower($0)}')
+      
+    - name: "Release Incomming Part"
+      working-directory: .release
+      env:
+        INCOMING_PATH: /oec-linux/opsgenie-${INTEGRATION_NAME}
+      run: |
+        if [ -d "$INCOMING_PATH" ]; then
+          go get -u github.com/alexcesaro/log && \
+          cd ${INCOMING_PATH} && \
+          GOOS=linux GOARCH=amd64 go build -o send2opsgenie send2opsgenie.go
+        fi
+
+    - uses: montudor/action-zip@v0.1.0
+      name: Compressing Linux Package
+      with:
+        zip -r opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip /${INTEGRATION_PATH} 
+        args: zip -qq -j -r .release/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip .release/oec-linux/
+    - name: Upload Artifacts 
+      uses: actions/upload-artifact@v2
+      with:
+        name: Release Artifacts
+        path: .release/oec-linux/*.zip
