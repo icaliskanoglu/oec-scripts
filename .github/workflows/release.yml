@@ -54,6 +54,7 @@ jobs:
       working-directory: .release
       run: |
         INTEGRATION_PATH=opsgenie-${INTEGRATION_NAME}
+        echo ${INTEGRATION_PATH}
         if [ -d "$INCOMING_PATH" ]; then
           go get -u github.com/alexcesaro/log && \
           cd ${INCOMING_PATH} && \
