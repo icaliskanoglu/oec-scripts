@@ -46,11 +46,11 @@ jobs:
 
     - name: Retrieve Integration Version
       run: |
-        echo ::set-env name=INTEGRATION_VERSION::$(jq -r --arg v "$INTEGRATION" '.[$v]' release/oec-builder/oecScriptsVersion.json)
+        echo ::set-env name=INTEGRATION_VERSION::$(jq -r --arg v "${{ github.event.inputs.integration }}" '.[$v]' release/oec-builder/oecScriptsVersion.json)
 
     - name: Retrieve Integration Name
       run: |
-        echo ::set-env name=INTEGRATION_NAME::$(echo "$INTEGRATION" | awk '{print tolower($0)}')
+        echo ::set-env name=INTEGRATION_NAME::$(echo "${{ github.event.inputs.integration }}" | awk '{print tolower($0)}')
       
     - name: "Release Incomming Part"
       working-directory: .release
