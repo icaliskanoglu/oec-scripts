@@ -66,7 +66,7 @@ jobs:
     - uses: montudor/action-zip@v0.1.0
       name: Compressing Linux Package
       with:
-        args: zip -qq -j -r .release/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip .release/oec-linux/
+        args: zip -qq -j -r .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip .release/oec-linux/
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
