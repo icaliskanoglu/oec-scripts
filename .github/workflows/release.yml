@@ -51,19 +51,22 @@ jobs:
     - name: Retrieve Integration Name
       run: |
         echo ::set-env name=INTEGRATION_NAME::$(echo "${{ github.event.inputs.integration }}" | awk '{print tolower($0)}')
+    
+    - name: Check incomming part exists
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "oec-linux/opsgenie-${INTEGRATION_NAME}"
       
     - name: "Release Incomming Part"
       working-directory: .release
+      if: steps.check_files.outputs.files_exists == 'true'
       run: |
-        ls -al
-        ls -al oec-linux/
         INTEGRATION_PATH=oec-linux/opsgenie-${INTEGRATION_NAME}
         echo ${INTEGRATION_PATH}
-        if [ -d "${INTEGRATION_PATH}" ]; then
-          go get -u github.com/alexcesaro/log && \
-          cd ${INTEGRATION_PATH} && \
-          GOOS=linux GOARCH=amd64 go build -o send2opsgenie send2opsgenie.go
-        fi
+        go get -u github.com/alexcesaro/log && \
+        cd ${INTEGRATION_PATH} && \
+        GOOS=linux GOARCH=amd64 go build -o send2opsgenie send2opsgenie.go
 
     - name: Compressing Linux Package
       run: zip -qq -j -r .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip .release/oec-linux/
