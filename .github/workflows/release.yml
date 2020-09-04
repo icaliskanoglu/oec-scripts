@@ -126,8 +126,8 @@ jobs:
         sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" SPECS/oec.spec && \
         sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" SPECS/oec-rhel6.spec && \
 
-        sed -i "s/%INTEGRATION%/${INTEGRATION_PATH}/g" SPECS/oec.spec && \
-        sed -i "s/%INTEGRATION%/${INTEGRATION_PATH}/g" SPECS/oec-rhel6.spec && \
+        sed -i "s/%INTEGRATION%/opsgenie-${INTEGRATION_NAME}/g" SPECS/oec.spec && \
+        sed -i "s/%INTEGRATION%/opsgenie-${INTEGRATION_NAME}/g" SPECS/oec-rhel6.spec && \
     - name: Build OEC RPM package
       id: oec-rpm
       uses: naveenrajm7/rpmbuild@master
