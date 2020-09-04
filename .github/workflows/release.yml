@@ -12,6 +12,9 @@ jobs:
   setup:
     name: Setup For Release
     runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        run: echo OK
   build-linux:
     name: Release for Linux
     runs-on: ubuntu-latest
