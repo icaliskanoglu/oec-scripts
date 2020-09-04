@@ -15,8 +15,8 @@ jobs:
     steps:
       - name: Setup
         run: echo OK
-  build-linux:
-    name: Release for Linux
+  linux:
+    name: Linux
     runs-on: ubuntu-latest
     needs: [setup]
     if: github.ref == 'refs/heads/master'
@@ -68,8 +68,88 @@ jobs:
       with:
         name: Release Artifacts
         path: .release/oec-linux/*.zip
-  build-win32:
-    name: Release For Windows 32
+  rpm:
+    name: RPM
+    runs-on: ubuntu-latest
+    needs: [setup]
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13
+      id: go
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+    - name: Create Output Directory
+      run: mkdir -p .release/oec-rpm
+    - name: Download Asset
+      uses: i3h/download-release-asset@v1.2.0
+      with:
+        owner: ahmetrehaseker
+        repo: oec
+        tag: ${{ github.event.inputs.oec-version }}
+        file: oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip
+    - name: Extracting Linux Package
+      run: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d .release/oec-rpm
+    - name: Copy SPEC Files
+      run: cp -R release/oec-builder/oec-rpm/SPECS/. .release/oec-rpm/SPECS
+    - name: Copy Integration Files
+      run: cp -R ${{ github.event.inputs.integration }}/. .release/oec-rpm
+    - name: Retrieve Integration Version
+      run: |
+        echo ::set-env name=INTEGRATION_VERSION::$(jq -r --arg v "${{ github.event.inputs.integration }}" '.[$v]' release/oec-builder/oecScriptsVersion.json)
+    - name: Retrieve Integration Name
+      run: |
+        echo ::set-env name=INTEGRATION_NAME::$(echo "${{ github.event.inputs.integration }}" | awk '{print tolower($0)}')
+    - name: Check incomming part exists
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: ".release/oec-rpm/opsgenie-${{ env.INTEGRATION_NAME }}"
+    - name: "Release Incomming Part"
+      working-directory: .release
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: |
+        INTEGRATION_PATH=oec-rpm/opsgenie-${INTEGRATION_NAME}
+        echo ${INTEGRATION_PATH}
+        go get -u github.com/alexcesaro/log && \
+        cd ${INTEGRATION_PATH} && \
+        GOOS=linux GOARCH=amd64 go build -o send2opsgenie send2opsgenie.go
+    - name: Configure Spec File 
+      working-directory: .release/oec-rpm
+      run: |
+        sed -i "s|<path_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/scripts/actionExecutor.py|" conf/config.json
+        sed -i "s|<path_of_output_file_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/output/output.txt|" conf/config.json
+        sed -i "s/<local | git>/local/g" conf/config.json
+
+        sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" SPECS/oec.spec && \
+        sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" SPECS/oec-rhel6.spec && \
+
+        sed -i "s/%INTEGRATION%/${INTEGRATION_PATH}/g" SPECS/oec.spec && \
+        sed -i "s/%INTEGRATION%/${INTEGRATION_PATH}/g" SPECS/oec-rhel6.spec && \
+    - name: Build OEC RPM package
+      id: oec-rpm
+      uses: naveenrajm7/rpmbuild@master
+      with:
+        spec_file: ".release/oec-rpm/SPECS/oec.spec"
+    - name: Build RHEL RPM package
+      id: rhel-rpm
+      uses: naveenrajm7/rpmbuild@master
+      with:
+        spec_file: ".release/oec-rpm/SPECS/oec-rhel6.spec"
+    - name: Upload OEC artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Binary OEC RPM
+        path: ${{ steps.oec-rpm.outputs.rpm_dir_path }}
+    - name: Upload OEC RHEL artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Binary RHEL RPM
+        path: ${{ steps.rhel-rpm.outputs.rpm_dir_path }}
+  win32:
+    name: Windows 32
     runs-on: ubuntu-latest
     needs: [setup]
     if: github.ref == 'refs/heads/master'    
@@ -121,8 +201,8 @@ jobs:
       with:
         name: Release Artifacts
         path: .release/oec-win32/*.zip
-  build-win64:
-    name: Release For Windows 64
+  win64:
+    name: Windows 64
     runs-on: ubuntu-latest
     needs: [setup]
     if: github.ref == 'refs/heads/master'    
