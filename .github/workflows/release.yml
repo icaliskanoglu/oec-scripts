@@ -130,12 +130,12 @@ jobs:
         sed -i "s/%INTEGRATION%/opsgenie-${INTEGRATION_NAME}/g" SPECS/oec-rhel6.spec
     - name: Build OEC RPM package
       id: oec-rpm
-      uses: naveenrajm7/rpmbuild@master
+      uses: naveenrajm7/rpmbuild@v1.0.0
       with:
         spec_file: ".release/oec-rpm/SPECS/oec.spec"
     - name: Build RHEL RPM package
       id: rhel-rpm
-      uses: naveenrajm7/rpmbuild@master
+      uses: naveenrajm7/rpmbuild@v1.0.0
       with:
         spec_file: ".release/oec-rpm/SPECS/oec-rhel6.spec"
     - name: Upload OEC artifact
