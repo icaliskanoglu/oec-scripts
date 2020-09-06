@@ -119,9 +119,9 @@ jobs:
     - name: Configure Spec File 
       working-directory: .release/oec-rpm
       run: |
-        sed -i "s|<path_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/scripts/actionExecutor.py|" conf/config.json
-        sed -i "s|<path_of_output_file_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/output/output.txt|" conf/config.json
-        sed -i "s/<local | git>/local/g" conf/config.json
+        sh -c "sed -i "s|<path_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/scripts/actionExecutor.py|" conf/config.json"
+        sh -c "sed -i "s|<path_of_output_file_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/output/output.txt|" conf/config.json"
+        sh -c "sed -i "s/<local | git>/local/g" conf/config.json"
 
         sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" SPECS/oec.spec && \
         sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" SPECS/oec-rhel6.spec && \
