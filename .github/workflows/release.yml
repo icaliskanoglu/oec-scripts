@@ -13,8 +13,22 @@ jobs:
     name: Setup For Release
     runs-on: ubuntu-latest
     steps:
-      - name: Setup
-        run: echo OK
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.inputs.integration }} OEC ${{ github.event.inputs.oec-version }}
+        release_name: Release ${{ github.event.inputs.integration }}-oec-${{ github.event.inputs.oec-version }}
+        draft: true
+    - name: Create URL Artifact
+      run: echo ${{ steps.create_release.outputs.upload_url }} > upload-url.txt
+    - name: Upload URL file
+      uses: actions/upload-artifact@v2
+      with:
+        name: upload-url
+        path: upload-url.txt
   linux:
     name: Linux
     runs-on: ubuntu-latest
@@ -68,6 +82,22 @@ jobs:
       with:
         name: Linux Artifacts
         path: .release/oec-linux/*.zip
+    - name: Download Upload URL
+      uses: actions/download-artifact@v2
+      with:
+        name: upload-url
+    - name: Retrieve Upload URL
+      run: |
+        echo ::set-env name=UPLOAD_URL::$(cat upload-url.txt)
+    - name: Upload
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ env.UPLOAD_URL }}
+        asset_path: .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip
+        asset_name: opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip
+        asset_content_type: application/zip
   rpm:
     name: RPM
     runs-on: ubuntu-latest
@@ -131,11 +161,29 @@ jobs:
 
         rpmbuild --target=x86_64 -ba SPECS/oec.spec
         rpmbuild --target=x86_64 -ba SPECS/oec-rhel6.spec
+    - name: Compressing RPM Package
+      run: zip -qq -j -r ~/rpmbuild/RPMS/x86_64/*.rpm .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-x86_64.zip
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
         name: RPM Artifacts
-        path: ~/rpmbuild/RPMS/x86_64/*.rpm
+        path: .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-x86_64.zip
+    - name: Download Upload URL
+      uses: actions/download-artifact@v2
+      with:
+        name: upload-url
+    - name: Retrieve Upload URL
+      run: |
+        echo ::set-env name=UPLOAD_URL::$(cat upload-url.txt)
+    - name: Upload 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ env.UPLOAD_URL }}
+        asset_path: .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-x86_64.zip
+        asset_name: opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-x86_64.zip
+        asset_content_type: application/zip
   deb:
     name: DEB
     runs-on: ubuntu-latest
@@ -203,6 +251,22 @@ jobs:
       with:
         name: Debian Artifacts
         path: .release/deb-package/*.deb
+    - name: Download Upload URL
+      uses: actions/download-artifact@v2
+      with:
+        name: upload-url
+    - name: Retrieve Upload URL
+      run: |
+        echo ::set-env name=UPLOAD_URL::$(cat upload-url.txt)
+    - name: Upload 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ env.UPLOAD_URL }}
+        asset_path: .release/deb-package/${INTEGRATION_NAME}_${INTEGRATION_VERSION}_amd64.deb
+        asset_name: ${INTEGRATION_NAME}_${INTEGRATION_VERSION}_amd64.deb
+        asset_content_type: application/zip
   win32:
     name: Windows 32
     runs-on: ubuntu-latest
@@ -256,6 +320,22 @@ jobs:
       with:
         name: Win32 Artifacts
         path: .release/oec-win32/*.zip
+    - name: Download Upload URL
+      uses: actions/download-artifact@v2
+      with:
+        name: upload-url
+    - name: Retrieve Upload URL
+      run: |
+        echo ::set-env name=UPLOAD_URL::$(cat upload-url.txt)
+    - name: Upload
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ env.UPLOAD_URL }}
+        asset_path: .release/oec-win32/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-win-386.zip
+        asset_name: opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-win-386.zip
+        asset_content_type: application/zip
   win64:
     name: Windows 64
     runs-on: ubuntu-latest
@@ -309,3 +389,19 @@ jobs:
       with:
         name: Win64 Artifacts
         path: .release/oec-win64/*.zip
+    - name: Download Upload URL
+      uses: actions/download-artifact@v2
+      with:
+        name: upload-url
+    - name: Retrieve Upload URL
+      run: |
+        echo ::set-env name=UPLOAD_URL::$(cat upload-url.txt)
+    - name: Upload
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ env.UPLOAD_URL }}
+        asset_path: .release/oec-win64/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-win-amd64.zip
+        asset_name: opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-win-amd64.zip
+        asset_content_type: application/zip
