@@ -137,7 +137,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Release Artifacts
-        path: ~/rpmbuild/SRPMS/x86_64/*.rpm
+        path: ~/rpmbuild/RPMS/x86_64/*.rpm
   win32:
     name: Windows 32
     runs-on: ubuntu-latest
