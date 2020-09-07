@@ -161,7 +161,7 @@ jobs:
     - name: Extracting Linux Package
       run: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d .release/oec-deb/usr/local/bin
     - name: Copy SPEC Files
-      run: cp -R release/oec-builder/oec-rpm/. .release/oec-deb
+      run: cp -R release/oec-builder/oec-deb/. .release/oec-deb
     - name: Create Output Directory
       run: mkdir -p .release/oec-deb/home/opsgenie/oec
     - name: Copy Integration Files
