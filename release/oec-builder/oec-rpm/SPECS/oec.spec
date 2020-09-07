@@ -16,9 +16,9 @@ echo "BUILDROOT = $RPM_BUILD_ROOT"
 mkdir -p $RPM_BUILD_ROOT/usr/local/bin/
 mkdir -p $RPM_BUILD_ROOT/etc/systemd/system/
 mkdir -p $RPM_BUILD_ROOT/home/opsgenie/oec/
-cp .release/oec-rpm/OpsgenieEdgeConnector $RPM_BUILD_ROOT/usr/local/bin/
-cp .release/oec-rpm/oec.service $RPM_BUILD_ROOT/etc/systemd/system/
-cp -R .release/oec-rpm/oec-scripts/. $RPM_BUILD_ROOT/home/opsgenie/oec/
+cp $GITHUB_WORKSPACE/.release/oec-rpm/OpsgenieEdgeConnector $RPM_BUILD_ROOT/usr/local/bin/
+cp $GITHUB_WORKSPACE/.release/oec-rpm/oec.service $RPM_BUILD_ROOT/etc/systemd/system/
+cp -R $GITHUB_WORKSPACE/.release/oec-rpm/oec-scripts/. $RPM_BUILD_ROOT/home/opsgenie/oec/
 
 %pre
 if [ ! -d "/var/log/opsgenie" ]; then
