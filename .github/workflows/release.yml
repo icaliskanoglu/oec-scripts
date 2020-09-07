@@ -131,27 +131,8 @@ jobs:
         sed -i "s/%INTEGRATION%/opsgenie-${INTEGRATION_NAME}/g" SPECS/oec.spec
         sed -i "s/%INTEGRATION%/opsgenie-${INTEGRATION_NAME}/g" SPECS/oec-rhel6.spec
 
-    # rpmbuild --target=x86_64 -ba SPECS/oec.spec
-    - name: Build OEC RPM package
-      id: oec-rpm
-      uses: naveenrajm7/rpmbuild@v1.0.0
-      with:
-        spec_file: ".release/oec-rpm/SPECS/oec.spec"
-    - name: Build RHEL RPM package
-      id: rhel-rpm
-      uses: naveenrajm7/rpmbuild@v1.0.0
-      with:
-        spec_file: ".release/oec-rpm/SPECS/oec-rhel6.spec"
-    - name: Upload OEC artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: Binary OEC RPM
-        path: ${{ steps.oec-rpm.outputs.rpm_dir_path }}
-    - name: Upload OEC RHEL artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: Binary RHEL RPM
-        path: ${{ steps.rhel-rpm.outputs.rpm_dir_path }}
+        rpmbuild --target=x86_64 -ba SPECS/oec.spec
+        rpmbuild --target=x86_64 -ba SPECS/oec-rhel6.spec
   win32:
     name: Windows 32
     runs-on: ubuntu-latest
