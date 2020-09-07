@@ -90,8 +90,6 @@ jobs:
         repo: oec
         tag: ${{ github.event.inputs.oec-version }}
         file: oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip
-    - name: Working Dir
-      run: pwd
     - name: Extracting Linux Package
       run: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d .release/oec-rpm
     - name: Copy SPEC Files
@@ -118,7 +116,7 @@ jobs:
         go get -u github.com/alexcesaro/log && \
         cd ${INTEGRATION_PATH} && \
         GOOS=linux GOARCH=amd64 go build -o send2opsgenie send2opsgenie.go
-    - name: Configure Spec File 
+    - name: Create RPM Package 
       working-directory: .release/oec-rpm
       run: |
         sed -i "s|<path_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/scripts/actionExecutor.py|" oec-scripts/conf/config.json
@@ -138,6 +136,68 @@ jobs:
       with:
         name: Release Artifacts
         path: ~/rpmbuild/RPMS/x86_64/*.rpm
+  deb:
+    name: DEB
+    runs-on: ubuntu-latest
+    needs: [setup]
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13
+      id: go
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+    - name: Create Output Directory
+      run: mkdir -p .release/oec-deb/usr/local/bin
+    - name: Download Asset
+      uses: i3h/download-release-asset@v1.2.0
+      with:
+        owner: ahmetrehaseker
+        repo: oec
+        tag: ${{ github.event.inputs.oec-version }}
+        file: oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip
+    - name: Extracting Linux Package
+      run: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d .release/oec-deb/usr/local/bin
+    - name: Copy SPEC Files
+      run: cp -R release/oec-builder/oec-rpm/. .release/oec-deb
+    - name: Create Output Directory
+      run: mkdir -p .release/oec-deb/home/opsgenie/oec
+    - name: Copy Integration Files
+      run: cp -R ${{ github.event.inputs.integration }}/. .release/oec-deb/home/opsgenie/oec
+    - name: Retrieve Integration Version
+      run: |
+        echo ::set-env name=INTEGRATION_VERSION::$(jq -r --arg v "${{ github.event.inputs.integration }}" '.[$v]' release/oec-builder/oecScriptsVersion.json)
+    - name: Retrieve Integration Name
+      run: |
+        echo ::set-env name=INTEGRATION_NAME::$(echo "${{ github.event.inputs.integration }}" | awk '{print tolower($0)}')
+    - name: Check incomming part exists
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: ".release/oec-deb/home/opsgenie.oec/opsgenie-${{ env.INTEGRATION_NAME }}"
+    - name: "Release Incomming Part"
+      working-directory: .release
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: |
+        INTEGRATION_PATH=oec-deb/home/opsgenie.oec/opsgenie-${INTEGRATION_NAME}
+        echo ${INTEGRATION_PATH}
+        go get -u github.com/alexcesaro/log && \
+        cd ${INTEGRATION_PATH} && \
+        GOOS=linux GOARCH=amd64 go build -o send2opsgenie send2opsgenie.go
+    - name: Create RPM Package 
+      working-directory: .release/
+      run: |
+        sed -i "s|<path_of_script>|/home/opsgenie/oec/scripts/actionExecutor.py|" oec-deb/home/opsgenie/oec/conf/config.json
+        sed -i "s|<path_of_output_file_of_script>|/home/opsgenie/oec/output/output.txt|" oec-deb/home/opsgenie/oec/conf/config.json
+        sed -i "s/<local | git>/local/g" oec-deb/home/opsgenie/oec/conf/config.json
+
+        sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" /oec-deb/DEBIAN/control
+        sed -i "s/%INTEGRATION%/${INTEGRATION_PATH}/g" /oec-deb/DEBIAN/control
+
+        mkdir deb-package
+        dpkg-deb -b  oec-deb/deb-package deb-package
   win32:
     name: Windows 32
     runs-on: ubuntu-latest
