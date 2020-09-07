@@ -23,7 +23,7 @@ jobs:
         release_name: Release ${{ github.event.inputs.integration }}-oec-${{ github.event.inputs.oec-version }}
         draft: true
     - name: Create URL Artifact
-      run: echo "${{ steps.create_release.outputs.upload_url }} > upload-url.txt"
+      run: echo "${{ steps.create_release.outputs.upload_url }}" > upload-url.txt
     - name: Upload URL file
       uses: actions/upload-artifact@v2
       with:
