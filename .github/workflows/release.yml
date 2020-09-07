@@ -133,6 +133,11 @@ jobs:
 
         rpmbuild --target=x86_64 -ba SPECS/oec.spec
         rpmbuild --target=x86_64 -ba SPECS/oec-rhel6.spec
+    # - name: Upload Artifacts 
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Release Artifacts
+    #     path: .release/oec-win32/*.zip
   win32:
     name: Windows 32
     runs-on: ubuntu-latest

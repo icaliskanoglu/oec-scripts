@@ -1,6 +1,6 @@
-Name: %INTEGRATION_NAME%
-Version: %INTEGRATION_VERSION%
-Summary: OEC (%INTEGRATION_NAME%) for Connecting On-Premise Monitoring and ITSM Tools
+Name: %INTEGRATION%
+Version: %VERSION%
+Summary: OEC (%INTEGRATION%) for Connecting On-Premise Monitoring and ITSM Tools
 Release: 1
 License: Apache-2.0
 URL: https://www.opsgenie.com/
