@@ -167,7 +167,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: RPM Artifacts
-        path: .release/oec-rpm/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-x86_64.zip
+        path: .release/oec-rpm/opsgenie-${{ env.INTEGRATION_NAME }}-${{ env.INTEGRATION_VERSION }}-x86_64.zip
     - name: Download Upload URL
       uses: actions/download-artifact@v2
       with:
@@ -246,11 +246,13 @@ jobs:
 
         mkdir deb-package
         dpkg-deb -b  oec-deb deb-package
+    - name: Compressing RPM Package
+      run: zip -qq -j -r .release/oec-deb/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-x86_64.zip .release/deb-package/*.deb
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
         name: Debian Artifacts
-        path: .release/deb-package/*.deb
+        path: .release/oec-deb/opsgenie-${{ env.INTEGRATION_NAME }}-${{ env.INTEGRATION_VERSION }}-x86_64.zip
     - name: Download Upload URL
       uses: actions/download-artifact@v2
       with:
@@ -264,8 +266,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ env.UPLOAD_URL }}
-        asset_path: .release/deb-package/${{ env.INTEGRATION_NAME }}_${{ env.INTEGRATION_VERSION }}_amd64.deb
-        asset_name: ${{ env.INTEGRATION_NAME }}_${{ env.INTEGRATION_VERSION }}_amd64.deb
+        asset_path: .release/oec-deb/opsgenie-${{ env.INTEGRATION_NAME }}-${{ env.INTEGRATION_VERSION }}-x86_64.zip
+        asset_name: opsgenie-${{ env.INTEGRATION_NAME }}-${{ env.INTEGRATION_VERSION }}-x86_64.zip
         asset_content_type: application/zip
   win32:
     name: Windows 32
