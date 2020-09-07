@@ -97,7 +97,7 @@ jobs:
     - name: Copy SPEC Files
       run: cp -R release/oec-builder/oec-rpm/. .release/oec-rpm
     - name: Copy Integration Files
-      run: cp -R ${{ github.event.inputs.integration }}/. .release/oec-rpm
+      run: cp -R ${{ github.event.inputs.integration }}/. .release/oec-rpm/oec-scripts
     - name: Retrieve Integration Version
       run: |
         echo ::set-env name=INTEGRATION_VERSION::$(jq -r --arg v "${{ github.event.inputs.integration }}" '.[$v]' release/oec-builder/oecScriptsVersion.json)
@@ -108,12 +108,12 @@ jobs:
       id: check_files
       uses: andstor/file-existence-action@v1
       with:
-        files: ".release/oec-rpm/opsgenie-${{ env.INTEGRATION_NAME }}"
+        files: ".release/oec-rpm/oec-scripts/opsgenie-${{ env.INTEGRATION_NAME }}"
     - name: "Release Incomming Part"
       working-directory: .release
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
-        INTEGRATION_PATH=oec-rpm/opsgenie-${INTEGRATION_NAME}
+        INTEGRATION_PATH=oec-rpm/oec-scripts/opsgenie-${INTEGRATION_NAME}
         echo ${INTEGRATION_PATH}
         go get -u github.com/alexcesaro/log && \
         cd ${INTEGRATION_PATH} && \
@@ -121,9 +121,9 @@ jobs:
     - name: Configure Spec File 
       working-directory: .release/oec-rpm
       run: |
-        sed -i "s|<path_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/scripts/actionExecutor.py|" conf/config.json
-        sed -i "s|<path_of_output_file_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/output/output.txt|" conf/config.json
-        sed -i "s/<local | git>/local/g" conf/config.json
+        sed -i "s|<path_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/scripts/actionExecutor.py|" oec-scripts/conf/config.json
+        sed -i "s|<path_of_output_file_of_script>|$RPM_BUILD_ROOT/home/opsgenie/oec/output/output.txt|" oec-scripts/conf/config.json
+        sed -i "s/<local | git>/local/g" oec-scripts/conf/config.json
 
         sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" SPECS/oec.spec
         sed -i "s/%VERSION%/${INTEGRATION_VERSION}/g" SPECS/oec-rhel6.spec
