@@ -95,7 +95,7 @@ jobs:
     - name: Extracting Linux Package
       run: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d .release/oec-rpm
     - name: Copy SPEC Files
-      run: cp -R release/oec-builder/oec-rpm/SPECS/. .release/oec-rpm/SPECS
+      run: cp -R release/oec-builder/oec-rpm/. .release/oec-rpm
     - name: Copy Integration Files
       run: cp -R ${{ github.event.inputs.integration }}/. .release/oec-rpm
     - name: Retrieve Integration Version
