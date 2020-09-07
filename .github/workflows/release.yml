@@ -19,7 +19,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.event.inputs.integration }} OEC ${{ github.event.inputs.oec-version }}
+        tag_name: ${{ github.event.inputs.integration }}-OEC-${{ github.event.inputs.oec-version }}
         release_name: Release ${{ github.event.inputs.integration }}-oec-${{ github.event.inputs.oec-version }}
         draft: true
     - name: Create URL Artifact
