@@ -229,7 +229,7 @@ jobs:
       working-directory: .release
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
-        INTEGRATION_PATH=oec-deb/home/opsgenie.oec/opsgenie-${INTEGRATION_NAME}
+        INTEGRATION_PATH=oec-deb/home/opsgenie/oec/opsgenie-${INTEGRATION_NAME}
         echo ${INTEGRATION_PATH}
         go get -u github.com/alexcesaro/log && \
         cd ${INTEGRATION_PATH} && \
