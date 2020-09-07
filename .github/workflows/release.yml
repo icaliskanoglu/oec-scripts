@@ -197,7 +197,7 @@ jobs:
         sed -i "s/%INTEGRATION%/${INTEGRATION_PATH}/g" oec-deb/DEBIAN/control
 
         mkdir deb-package
-        dpkg-deb -b  oec-deb/deb-package deb-package
+        dpkg-deb -b  oec-deb deb-package
   win32:
     name: Windows 32
     runs-on: ubuntu-latest
