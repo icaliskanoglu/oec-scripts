@@ -23,7 +23,7 @@ jobs:
         release_name: Release ${{ github.event.inputs.integration }}-oec-${{ github.event.inputs.oec-version }}
         draft: true
     - name: Create URL Artifact
-      run: echo ${{ steps.create_release.outputs.upload_url }} > upload-url.txt
+      run: echo "${{ steps.create_release.outputs.upload_url }} > upload-url.txt"
     - name: Upload URL file
       uses: actions/upload-artifact@v2
       with:
@@ -162,7 +162,8 @@ jobs:
         rpmbuild --target=x86_64 -ba SPECS/oec.spec
         rpmbuild --target=x86_64 -ba SPECS/oec-rhel6.spec
     - name: Compressing RPM Package
-      run: zip -qq -j -r ~/rpmbuild/RPMS/x86_64/* .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-x86_64.zip
+      run: zip -qq -j -r .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-linux-amd64.zip .release/oec-linux/
+      run: zip -qq -j -r .release/oec-linux/opsgenie-${INTEGRATION_NAME}-${INTEGRATION_VERSION}-x86_64.zip ~/rpmbuild/RPMS/x86_64/*.rpm
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
