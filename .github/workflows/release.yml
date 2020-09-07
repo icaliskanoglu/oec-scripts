@@ -66,7 +66,7 @@ jobs:
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
-        name: Release Artifacts
+        name: Linux Artifacts
         path: .release/oec-linux/*.zip
   rpm:
     name: RPM
@@ -134,7 +134,7 @@ jobs:
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
-        name: Release Artifacts
+        name: RPM Artifacts
         path: ~/rpmbuild/RPMS/x86_64/*.rpm
   deb:
     name: DEB
@@ -198,7 +198,11 @@ jobs:
 
         mkdir deb-package
         dpkg-deb -b  oec-deb deb-package
-        ls -al deb-package
+    - name: Upload Artifacts 
+      uses: actions/upload-artifact@v2
+      with:
+        name: Debian Artifacts
+        path: .release/deb-package/*.deb
   win32:
     name: Windows 32
     runs-on: ubuntu-latest
@@ -250,7 +254,7 @@ jobs:
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
-        name: Release Artifacts
+        name: Win32 Artifacts
         path: .release/oec-win32/*.zip
   win64:
     name: Windows 64
@@ -303,5 +307,5 @@ jobs:
     - name: Upload Artifacts 
       uses: actions/upload-artifact@v2
       with:
-        name: Release Artifacts
+        name: Win64 Artifacts
         path: .release/oec-win64/*.zip
