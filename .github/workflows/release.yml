@@ -90,6 +90,8 @@ jobs:
         repo: oec
         tag: ${{ github.event.inputs.oec-version }}
         file: oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip
+    - name: Working Dir
+      run: pwd
     - name: Extracting Linux Package
       run: unzip -qq oec-linux-amd64-${{ github.event.inputs.oec-version }}.zip -d .release/oec-rpm
     - name: Copy SPEC Files
