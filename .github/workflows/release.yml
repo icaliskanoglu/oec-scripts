@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       integration:
-        description: 'Integration'     
+        description: 'Integration2'     
         required: true
       oec-version:
         description: 'Version of OEC'
